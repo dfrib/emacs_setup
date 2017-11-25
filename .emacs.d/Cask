@@ -5,13 +5,20 @@
 (depends-on "cask")
 (depends-on "cask-mode") 
 
-;; cmake-ide & rtags (& company & flycheck)
+;; --- cmake-ide with rtags/company/irony/flycheck
 (depends-on "cmake-ide")
-(depends-on "rtags")
-(depends-on "company")
-(depends-on "company-rtags")
 (depends-on "flycheck")
+;; rtags for navigation and syntax checking (flycheck)
+(depends-on "rtags")
 (depends-on "flycheck-rtags")
+;; company & irony for completion
+(depends-on "irony")
+(depends-on "company")
+(depends-on "company-irony")
+(depends-on "company-irony-c-headers")
+;; alternatives: company-rtags for completion, irony for syntax checking
+;(depends-on "company-rtags")
+;(depends-on "flycheck-irony")
 
 ;; other flycheck modes
 (depends-on "flycheck-color-mode-line")

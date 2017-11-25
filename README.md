@@ -1,4 +1,4 @@
-_Acknowledgements: to Ian K for once upon a time enthusiastically introducing me to Emacs, something I always try to pass on to my non-Emacs using friends and colleagues._
+_(Acknowledgement to Ian K for once upon a time enthusiastically introducing me to Emacs, something I always try to pass on to my non-Emacs using friends and colleagues)_
 
 Table of Contents
 =================
@@ -20,6 +20,8 @@ Table of Contents
       * [Installing cask](#installing-cask)
       * [Setting up a Cask project file for your Emacs configuration](#setting-up-a-cask-project-file-for-your-emacs-configuration)
    * [Setting up Emacs](#setting-up-emacs)
+      * [Installing irony-server](#installing-irony-server)
+         * [Alternatively (less recommended), use company-rtags for code completion](#alternatively-less-recommended-use-company-rtags-for-code-completion)
       * [Trying it all out](#trying-it-all-out)
    * [Launching the RTags daemon (rdm) prior to Emacs - tmux example](#launching-the-rtags-daemon-rdm-prior-to-emacs---tmux-example)
 
@@ -243,6 +245,25 @@ $ cask install
 # Setting up Emacs
 
 Replace the dummy `init.el` file from the step above with the `/.emacs.d/init.el` file of this repo. You might need to modify the `cmake-ide-build-dir` and `rtags-path` paths in `init.el` file; they are both set to `~/opensource/rtags/build` by default.
+
+## Installing irony-server
+
+Upon first Emacs launch, install the `irony-server`, which provides the `libclang` interface to `irony-mode` (used for `company-irony` / code completion):
+
+```
+# In Emacs
+M-x irony-install-server
+# yields a cmake install command -> accept [RET]
+
+```
+
+A successful installation prompts you with _"`irony-server` installed successfully!"_.
+
+### Alternatively (less recommended), use company-rtags for code completion
+
+As an alternative to using `irony` for code completion, `rtags` can be used also here (i.e., not only for navigation and syntax checking), via its `company` backend `company-rtags`. In this case, you needn't install the `irony-server` above, but can fall back on the `rdm` deamon for a `libclang` interface. This will load `company-rtags` rather than `company-irony` as `company` backend; you will see these lines commented out in the `Cask` file as well as in `init.el`. Remember to re-install the Cask dependencies if you update the `Cask` file.
+
+Note though that I would recommend using `irony` for completion; , I've had had better experience with it, as I get the feeling `rtags` is somewhat slower.
 
 ## Trying it all out
 

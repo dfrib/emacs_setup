@@ -90,21 +90,26 @@
 ;; (I prefer to launch rdm externally and prior to Emacs)
 ;(rtags-start-process-unless-running)
 
-;; Enable code completion in Emacs with company mode.
-
 ;; Enable rtags-diagnostics.
 (setq rtags-autostart-diagnostics t)
 (rtags-diagnostics)
 
+
+;; Enable code completion in Emacs with rtags & company mode.
+;-> use irony for completions
+
 ;; Enable completions in rtags.
-(setq rtags-completions-enabled t)
+;(setq rtags-completions-enabled t)
+;-> use irony for completions
 
 ;; Enable company mode
-(require 'company)
-(global-company-mode)
+;(require 'company)
+;(global-company-mode)
+;-> use irony for completions
 
 ;; Add company-rtags to company-backends
-(push 'company-rtags company-backends)
+;(push 'company-rtags company-backends)
+;-> use irony for completions
 
 ;; Timeout for reparse on onsaved buffers
 (rtags-set-periodic-reparse-timeout 0.5)
@@ -133,7 +138,7 @@
 (with-eval-after-load 'flycheck
   (flycheck-pos-tip-mode))
 
-;; rtags with Flycheck
+;; rtags with Flycheck (syntax checking)
 (require 'flycheck-rtags)
 (defun my-flycheck-rtags-setup ()
   (flycheck-select-checker 'rtags)
@@ -147,6 +152,43 @@
 (with-eval-after-load 'flycheck
   (require 'flycheck-plantuml)
   (flycheck-plantuml-setup))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; irony (C/C++ minor mode powered by libclang) and company for completions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(add-hook 'c++-mode-hook 'irony-mode)
+(add-hook 'c-mode-hook 'irony-mode)
+;(add-hook 'objc-mode-hook 'irony-mode)
+(add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+
+;; replace the `completion-at-point' and `complete-symbol' bindings in
+;; irony-mode's buffers by irony-mode's function
+(defun my-irony-mode-hook ()
+  (define-key irony-mode-map [remap completion-at-point]
+    'irony-completion-at-point-async)
+  (define-key irony-mode-map [remap complete-symbol]
+    'irony-completion-at-point-async))
+(add-hook 'irony-mode-hook 'my-irony-mode-hook)
+(add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+
+;; Enable company mode
+(require 'company)
+(global-company-mode)
+
+;; company-irony
+(require 'company-irony-c-headers)
+;; Load with `irony-mode` as a grouped backend
+(eval-after-load 'company
+  '(add-to-list
+    'company-backends '(company-irony-c-headers company-irony)))
+
+;; (eval-after-load 'company
+;;   '(add-to-list 'company-backends 'company-irony))
+
+;; (optional) adds CC special commands to `company-begin-commands' in order to
+;; trigger completion at interesting places, such as after scope operator
+;;     std::|
+(add-hook 'irony-mode-hook 'company-irony-setup-begin-commands)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; clang-format
