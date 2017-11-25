@@ -40,6 +40,8 @@ Some other convenience packages worth mentioning:
 - [`plantuml-mode`](https://github.com/skuro/plantuml-mode) major mode for editing and swiftly pre-viewing PlantUML diagrams.
   - Naturally requires the `plantuml.jar`.
 
+Finally, I use [`cask`](http://cask.readthedocs.io/en/latest/index.html) to manage package dependencies for my Emacs configuration.
+
 # Installing pre-requisites
 
 I wont even mention `git`.
@@ -73,8 +75,22 @@ $ sudo apt-get install cmake
 Next up, we install clang and llvm. For Ubuntu Xenial, at the time of writing, `clang-4.0`/`llvm-4.0` are appropriate candidates (limiting ourselves to a stable branch; if you want e.g. 5.0 knock yourself out!):
 
 ```
-$ sudo apt-get install clang-4.0 llvm-4.0 libclang-4.0-dev
+$ sudo apt-get install clang-4.0 llvm-4.0 libclang-4.0-dev clang-format-4.0
 ```
+
+You might also want to update to use `clang-4.0` to provide for `/usr/bin/clang` (which may be entirely missing now):
+
+```
+$ sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-4.0 100 \
+--slave /usr/bin/clang++ clang++ /usr/bin/clang++-4.0 \
+--slave /usr/bin/clang-check clang-check /usr/bin/clang-check-4.0 \
+--slave /usr/bin/clang-query clang-query /usr/bin/clang-query-4.0 \
+--slave /usr/bin/clang-rename clang-rename /usr/bin/clang-rename-4.0 \
+--slave /usr/bin/clang-format clang-format /usr/bin/clang-format-4.0
+
+```
+
+Otherwise Emacs might prompt you that `clang` (or e.g. `clang-format`) cannot be found.
 
 #### RTags/rdm (RTags daemon)
 
@@ -129,6 +145,7 @@ $ ./install.sh
 
 Download the latest [`plantuml.jar`](http://plantuml.com/download). I usually place mine in `~/opensource/plantuml/`.
 
+
 # Installing Emacs 25
 
 In case you're not already running an Emacs 25 version:
@@ -165,6 +182,67 @@ $ sudo apt-get remove --purge emacsXY-...
 # et. cetera.
 ```
 
+# Installing and setting up Cask
+
+Before installing Cask, make sure that you `EMACS` environment variable point to the same Emacs version as your `emacs` command.
+
+```
+$ emacs --version
+
+# this must be the same version
+$ echo $EMACS
+```
+
+Is this is not a match, re-try in a new terminal window.
+
+## Installing cask
+
+To install Cask, run the follwing command:
+
+```
+$ curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
+```
+
+This should install Cask in `~/.cask/`. Make sure to follow the on-success prompt to add the `cask` binary to your path:
+
+```
+# e.g. in your .bashrc, or whatever shell you're using
+export PATH="/home/dfri/.cask/bin:$PATH"
+```
+
+## Setting up a Cask project file for your Emacs configuration
+
+Copy the `/.emacs.d/Cask` file of this repo to you local `~/.emacs.d/`. If the `~/.emacs.d/` folder is missing, create it or simply start/close `emacs` once to let it be created automatically.
+
+```
+```
+
+Moreover, create an `init.el` file in your local `~/.emacs.d/` folder with the following content:
+
+```
+$ cd ~/.emacs.d/
+$ touch init.el
+
+;; Add this into the init.el file (which is otherwise empty)
+(package-initialize)
+(require 'cask "~/.cask/cask.el")
+(cask-initialize)
+
+```
+
+and thereafter install all dependencies:
+
+```
+$ cask install
+```
+
 # Setting up Emacs
 
-...
+Replace the dummy `init.el` file from the step above with the `/.emacs.d/init.el` file of this repo.
+
+You should be good to go!
+
+
+# Starting the RDM server
+
+TODO: describe how to use e.g. `tmux` to setup an automatic `rdm` startup prior to launching Emacs.

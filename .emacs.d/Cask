@@ -1,0 +1,86 @@
+(source gnu)
+(source melpa)
+
+;; Cask
+(depends-on "cask")
+(depends-on "cask-mode") 
+
+;; cmake-ide & rtags (& company & flycheck)
+(depends-on "cmake-ide")
+(depends-on "rtags")
+(depends-on "company")
+(depends-on "company-rtags")
+(depends-on "flycheck")
+(depends-on "flycheck-rtags")
+
+;; other flycheck modes
+(depends-on "flycheck-color-mode-line")
+(depends-on "flycheck-pos-tip")
+(depends-on "flycheck-plantuml")
+
+;; formatting (google style / clang format)
+(depends-on "clang-format")
+(depends-on "google-c-style")
+
+;; Ivy
+(depends-on "ivy")
+(depends-on "counsel")
+(depends-on "swiper")
+(depends-on "ag")
+
+;; Magit
+(depends-on "magit")
+
+;; Language major modes
+(depends-on "cmake-mode")
+(depends-on "dockerfile-mode")
+(depends-on "plantuml-mode")
+(depends-on "protobuf-mode")
+
+;; use-package (isolated package configurations)
+(depends-on "use-package")
+
+;; Smart-mode-line
+(depends-on "smart-mode-line")
+(depends-on "smart-mode-line-powerline-theme")
+
+;; Themes
+(depends-on "sublime-themes")
+
+;; Highlight word under point when idle
+(depends-on "idle-highlight-mode")
+
+;; Drag stuff
+(depends-on "drag-stuff")
+
+;; Expand region (increase selection by semantic units)
+(depends-on "expand-region")
+
+;; Common
+(depends-on "bind-key")
+(depends-on "dash")
+
+;; Nyan Mode (break power line mode :( )
+;(depends-on "nyan-mode")
+
+;; YASnippet (template system / completion)
+;(depends-on "yasnippet")
+
+;; Pallet (package management helper / Cask file client)
+;(depends-on "pallet")
+
+;; Smartparens (smart handling of parenthesis pairs)
+;(depends-on "smartparens")
+
+;; Multiple cursors (mirror-editing at several lines at once)
+;(depends-on "multiple-cursors")
+
+;; web-mode (editing web templates)
+;(depends-on "web-mode")
+
+;; Could be useful
+;(depends-on "exec-path-from-shell")
+;(depends-on "popwin")
+;(depends-on "projectile")
+;(depends-on "f") ;; API for working with files and directories
+;(depends-on "s") ;; string manip
