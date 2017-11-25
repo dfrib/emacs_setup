@@ -16,13 +16,18 @@ Table of Contents
          * [Smart-mode-line](#smart-mode-line)
          * [PlantUML-mode](#plantuml-mode)
    * [Installing Emacs 25](#installing-emacs-25)
+   * [Installing and setting up Cask](#installing-and-setting-up-cask)
+      * [Installing cask](#installing-cask)
+      * [Setting up a Cask project file for your Emacs configuration](#setting-up-a-cask-project-file-for-your-emacs-configuration)
    * [Setting up Emacs](#setting-up-emacs)
+      * [Trying it all out](#trying-it-all-out)
+   * [Launching the RTags daemon (rdm) prior to Emacs - tmux example](#launching-the-rtags-daemon-rdm-prior-to-emacs---tmux-example)
 
 # Overview
 
 **Recently tested for Emacs 25.3.2, at Ubuntu Xenial (16.04)**
 
-My Emacs setup is mainly targeted for C++ development in CMake projects under Git version control.
+This document describes how to setup my Emacs environment, which is mainly targeted for C++ development in CMake projects under Git version control.
 
 The core packages of my setup are:
 
@@ -33,7 +38,7 @@ The core packages of my setup are:
 - [`magit`](https://magit.vc/) for any kind of Git interaction. `magit` is such an awesome Git client that I even recommend my non-Emacs-colleagues to turn to Emacs/`magit` solely for using Git (sneakily allowing to possibly tempt them to get into all other, never-ending additional upsides of using Emacs).
 - [`ivy`](https://github.com/abo-abo/swiper) for minibuffer code completion.
 
-Some other convenience packages worth mentioning:
+Some other convenience packages worth mentioning (as they require Emacs-external dependencies).
 
 - [`smart-mode-line`](https://github.com/Malabarba/smart-mode-line) with a powerline theme for a nice Emacs mode-line.
   - The `smart-mode-line-powerline-theme` requires you to install [Powerline fonts](https://github.com/powerline/fonts).
@@ -43,8 +48,7 @@ Some other convenience packages worth mentioning:
 Finally, I use [`cask`](http://cask.readthedocs.io/en/latest/index.html) to manage package dependencies for my Emacs configuration.
 
 # Installing pre-requisites
-
-I wont even mention `git`.
+(Naturally `git`)
 
 ## Installing pre-requisites for the core packages
 
@@ -64,10 +68,13 @@ Make sure you have CMake installed:
 $ cmake --version
 ```
 
-If you have none installed (or if it's for some reason hideously old, < CMake 2.8), get it e.g. directly from Ubuntu; at the time of writing this should install CMake 3.5.1, which suffices for RTags (even if it's somewhat ancient as compared to latest release 3.10):
+If you have none installed (or if it's for some reason hideously old, < CMake 2.8), get it e.g. directly via Ubuntu/APT; at the time of writing this should install CMake 3.5.1, which suffices for RTags (even if it's somewhat old as compared to the latest release 3.10):
 
 ```
+# CMake 3.5
 $ sudo apt-get install cmake
+
+# ... or install a more recent version "manually"
 ```
 
 #### Clang/LLVM
@@ -94,7 +101,7 @@ Otherwise Emacs might prompt you that `clang` (or e.g. `clang-format`) cannot be
 
 #### RTags/rdm (RTags daemon)
 
-Clone the RTags project; I chose to clone it into my `~/opensource` folder:
+Clone the RTags project; I usually clone to open source repos into my `~/opensource` folder:
 
 ```
 $ cd ~/opensource
@@ -115,7 +122,7 @@ $ sudo make install
 
 ### Ivy
 
-`ivy` is, but to point out some specifics, I use `ivy` for `swiper` in-buffer search and for the `counsel` (`ivy`-enhanced) Emacs commands. For the latter, most frequently `counsel-git` (find tracked file in current repo), `counsel-git-grep` and `counsel-ag`. The latter make use of [`ag` - The Silver Searcher](https://github.com/ggreer/the_silver_searcher), and is useful when wanting to search through only parts of a repository, limited to a folder and all tracked file therein (recursively for all sub-folders).
+`ivy` contains a lot of goodies, but to point out some specifics, I use `ivy` primarily for `swiper` in-buffer search and for the `counsel` (`ivy`-enhanced) Emacs commands. For the latter, most frequently `counsel-git` (find tracked file in current repo), `counsel-git-grep` and `counsel-ag`. The latter make use of [`ag` - The Silver Searcher](https://github.com/ggreer/the_silver_searcher), and is useful when wanting to search through only parts of a repository, limited to a folder and all tracked file therein (recursively for all sub-folders).
 
 To use `counsel-ag`, install `ag`:
 
@@ -143,7 +150,7 @@ $ ./install.sh
 
 ### PlantUML-mode
 
-Download the latest [`plantuml.jar`](http://plantuml.com/download). I usually place mine in `~/opensource/plantuml/`.
+To make use of PlantUML-mode for UML diagram generation within Emacs, naturally we need to download the latest [`plantuml.jar`](http://plantuml.com/download). I usually place mine in `~/opensource/plantuml/`.
 
 
 # Installing Emacs 25
@@ -184,7 +191,7 @@ $ sudo apt-get remove --purge emacsXY-...
 
 # Installing and setting up Cask
 
-Before installing Cask, make sure that you `EMACS` environment variable point to the same Emacs version as your `emacs` command.
+Before installing Cask, make sure that you `EMACS` environment variable pointa to the same Emacs version as your `emacs` command.
 
 ```
 $ emacs --version
@@ -214,10 +221,7 @@ export PATH="/home/dfri/.cask/bin:$PATH"
 
 Copy the `/.emacs.d/Cask` file of this repo to you local `~/.emacs.d/`. If the `~/.emacs.d/` folder is missing, create it or simply start/close `emacs` once to let it be created automatically.
 
-```
-```
-
-Moreover, create an `init.el` file in your local `~/.emacs.d/` folder with the following content:
+Moreover, create a (temporary) `init.el` file in your local `~/.emacs.d/` folder with the following content:
 
 ```
 $ cd ~/.emacs.d/
@@ -238,11 +242,23 @@ $ cask install
 
 # Setting up Emacs
 
-Replace the dummy `init.el` file from the step above with the `/.emacs.d/init.el` file of this repo.
+Replace the dummy `init.el` file from the step above with the `/.emacs.d/init.el` file of this repo. You might need to modify the `cmake-ide-build-dir` and `rtags-path` paths in `init.el` file; they are both set to `~/opensource/rtags/build` by default.
 
-You should be good to go!
+## Trying it all out
 
+A good place to start trying out Emacs/CMake-IDE/RTags setup is in the `rtags` repo that we already cloned above as part of installing RTags, as it covers a C++ CMake project (visit e.g. `rtags/src/rdm.cpp`.
 
-# Starting the RDM server
+Prior to launching `rdm` and `emacs` for this venture, make sure there is a `compile_commands.json` file present in the root for the project (under `rtags/`). You might possibly need to move the `compile_commands.json` file from `rtags/build` to `rtags/`. If you can't find it in `build`, one can be generated directly into repo root using `cmake`:
 
-TODO: describe how to use e.g. `tmux` to setup an automatic `rdm` startup prior to launching Emacs.
+```
+$ cd ~/opensource/rtags/
+$ cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 .
+```
+
+The `rdm` deamon can also be started from within Emacs, using e.g. the `(rtags-start-process-unless-running)` function, but I've had better experience in launching `rdm` prior to (and external from) `emacs`, e.g. using `tmux` (see next section). This command is present in the `init.el` file of this repo, but has been commented out.
+
+Happy exploring of Emacs!
+
+# Launching the RTags daemon (rdm) prior to Emacs - tmux example
+
+TODO: Describe how to use e.g. `tmux` to automatically start `rdm` (with `--no-filemanager`) prior to launching Emacs.

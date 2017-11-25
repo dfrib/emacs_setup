@@ -34,6 +34,7 @@
 ;; Language major modes
 (depends-on "cmake-mode")
 (depends-on "dockerfile-mode")
+(depends-on "markdown-mode")
 (depends-on "plantuml-mode")
 (depends-on "protobuf-mode")
 

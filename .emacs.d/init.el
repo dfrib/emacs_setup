@@ -80,12 +80,16 @@
 ;; CURRENTLY: hardcode to build dir of default project
 ;; TODO: fix via .dir-locals.el
 
-;; set path to rc
+;; set path to rtag executables
 (setq rtags-path
       (expand-file-name "~/opensource/rtags/build"))
 
 ;; invoke cmake-ide setup
 (cmake-ide-setup)
+
+;; start the rdm process unless the process is already running.
+;; (I prefer to launch rdm externally and prior to Emacs)
+;(rtags-start-process-unless-running)
 
 ;; Enable code completion in Emacs with company mode.
 
