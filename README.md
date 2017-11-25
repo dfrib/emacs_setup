@@ -1,30 +1,42 @@
-:toc: macro
-:toc-title:
-:toclevels: 4
+_Acknowledgements: to Ian K for once upon a time enthusiastically introducing me to Emacs, something I always try to pass on to my non-Emacs using friends and collegues._
+
+Table of Contents
+=================
+
+   * [Overview](#overview)
+   * [Installation and setup](#installation-and-setup)
+      * [Installing pre-requisites for the core packages](#installing-pre-requisites-for-the-core-packages)
+         * [CMake-IDE/RTags](#cmake-idertags)
+            * [CMake](#cmake)
+            * [Clang/LLVM](#clangllvm)
+            * [RTags/rdm (RTags daemon)](#rtagsrdm-rtags-daemon)
+         * [Ivy](#ivy)
+      * [Installing pre-requisites for the convenience packages](#installing-pre-requisites-for-the-convenience-packages)
+         * [Smart-mode-line](#smart-mode-line)
+         * [PlantUML-mode](#plantuml-mode)
+      * [Installing Emacs 25](#installing-emacs-25)
 
 # Overview
 
 **Recently tested for Emacs 25.3.2, at Ubuntu Xenial (16.04)**
-
-_Acknowledgements: to Ian K for once upon a time enthusiastically introducing me to Emacs, something I always try to pass on to my non-Emacs using friends and collegues._
 
 My Emacs setup is mainly targeted for C++ development in CMake projects under Git version control.
 
 The core packages of my setup are:
 
 - [`cmake-ide`](https://github.com/atilaneves/cmake-ide) with [`rtags`](https://github.com/Andersbakken/rtags) for IDE-like features on Emacs for CMake projects.
-..- Where `rtags` fall back on clang as C++ parser.
-..- Using [`flycheck`](https://github.com/flycheck/flycheck) for on-the-fly syntax checking.
-..- Combined with [`company-mode`](http://company-mode.github.io/) and [`irony-mode`](https://github.com/Sarcasm/irony-mode) (and clang parsing) for code completion.
+  - Where `rtags` fall back on clang as C++ parser.
+  - Using [`flycheck`](https://github.com/flycheck/flycheck) for on-the-fly syntax checking.
+  - Combined with [`company-mode`](http://company-mode.github.io/) and [`irony-mode`](https://github.com/Sarcasm/irony-mode) (and clang parsing) for code completion.
 - [`magit`](https://magit.vc/) for any kind of Git interaction. `magit` is such an awesome Git client that I even recommend my non-Emacs-collegues to turn to Emacs/`magit` solely for using Git (sneakily allowing to possibly tempt them to get into all other, never-ending additional upsides of using Emacs).
 - [`ivy`](https://github.com/abo-abo/swiper) for minibuffer code completion.
 
 Some other convenience packages worth mentioning:
 
 - [`smart-mode-line`](https://github.com/Malabarba/smart-mode-line) with a powerline theme for a nice Emacs mode-line.
-..- The `smart-mode-line-powerline-theme` requires you to install [Powerline fonts](https://github.com/powerline/fonts).
+  - The `smart-mode-line-powerline-theme` requires you to install [Powerline fonts](https://github.com/powerline/fonts).
 - [`plantuml-mode`](https://github.com/skuro/plantuml-mode) major mode for editing and swiftly pre-viewing PlantUML diagrams.
-..- Naturally requires the `plantuml.jar`.
+  - Naturally requires the `plantuml.jar`.
 
 # Installation and setup
 
@@ -104,11 +116,11 @@ For the `smart-mode-line-powerline-theme`, install [Powerline fonts](https://git
 $ cd ~/opensource
 
 # clone
-git clone https://github.com/powerline/fonts.git --depth=1
+$ git clone https://github.com/powerline/fonts.git --depth=1
 
 # install
-cd fonts
-./install.sh
+$ cd fonts
+$ ./install.sh
 ```
 
 ### PlantUML-mode
