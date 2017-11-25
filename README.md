@@ -1,10 +1,11 @@
-_Acknowledgements: to Ian K for once upon a time enthusiastically introducing me to Emacs, something I always try to pass on to my non-Emacs using friends and collegues._
+_Acknowledgements: to Ian K for once upon a time enthusiastically introducing me to Emacs, something I always try to pass on to my non-Emacs using friends and colleagues._
 
 Table of Contents
 =================
 
+   * [Table of Contents](#table-of-contents)
    * [Overview](#overview)
-   * [Installation and setup](#installation-and-setup)
+   * [Installing pre-requisites](#installing-pre-requisites)
       * [Installing pre-requisites for the core packages](#installing-pre-requisites-for-the-core-packages)
          * [CMake-IDE/RTags](#cmake-idertags)
             * [CMake](#cmake)
@@ -14,7 +15,8 @@ Table of Contents
       * [Installing pre-requisites for the convenience packages](#installing-pre-requisites-for-the-convenience-packages)
          * [Smart-mode-line](#smart-mode-line)
          * [PlantUML-mode](#plantuml-mode)
-      * [Installing Emacs 25](#installing-emacs-25)
+   * [Installing Emacs 25](#installing-emacs-25)
+   * [Setting up Emacs](#setting-up-emacs)
 
 # Overview
 
@@ -28,7 +30,7 @@ The core packages of my setup are:
   - Where `rtags` fall back on clang as C++ parser.
   - Using [`flycheck`](https://github.com/flycheck/flycheck) for on-the-fly syntax checking.
   - Combined with [`company-mode`](http://company-mode.github.io/) and [`irony-mode`](https://github.com/Sarcasm/irony-mode) (and clang parsing) for code completion.
-- [`magit`](https://magit.vc/) for any kind of Git interaction. `magit` is such an awesome Git client that I even recommend my non-Emacs-collegues to turn to Emacs/`magit` solely for using Git (sneakily allowing to possibly tempt them to get into all other, never-ending additional upsides of using Emacs).
+- [`magit`](https://magit.vc/) for any kind of Git interaction. `magit` is such an awesome Git client that I even recommend my non-Emacs-colleagues to turn to Emacs/`magit` solely for using Git (sneakily allowing to possibly tempt them to get into all other, never-ending additional upsides of using Emacs).
 - [`ivy`](https://github.com/abo-abo/swiper) for minibuffer code completion.
 
 Some other convenience packages worth mentioning:
@@ -38,7 +40,7 @@ Some other convenience packages worth mentioning:
 - [`plantuml-mode`](https://github.com/skuro/plantuml-mode) major mode for editing and swiftly pre-viewing PlantUML diagrams.
   - Naturally requires the `plantuml.jar`.
 
-# Installation and setup
+# Installing pre-requisites
 
 I wont even mention `git`.
 
@@ -127,6 +129,42 @@ $ ./install.sh
 
 Download the latest [`plantuml.jar`](http://plantuml.com/download). I usually place mine in `~/opensource/plantuml/`.
 
-## Installing Emacs 25
+# Installing Emacs 25
+
+In case you're not already running an Emacs 25 version:
+
+```
+$ emacs --version # 25?
+```
+
+Then install it. Emacs 25 is readily available via the APT package manager for Ubuntu:
+
+```
+$ sudo apt-get install emacs25
+```
+
+Ascertain, after installation, that you're not using an older version:
+
+```
+$ emacs --version # 25.X.Y?
+```
+
+I usually make sure to remove any older versions; packages `emacsXY`/`emacsXY-...` which is not `emacs25`. To identify such packages, study the output of:
+
+```
+$ dpkg --get-selections | grep emacs
+```
+
+Or just tab-complete `sudo apt-get remove ...`.
+
+To remove said packages:
+
+```
+$ sudo apt-get remove --purge emacsXY
+$ sudo apt-get remove --purge emacsXY-...
+# et. cetera.
+```
+
+# Setting up Emacs
 
 ...
