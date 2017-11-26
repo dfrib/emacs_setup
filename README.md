@@ -1,10 +1,12 @@
-_(Acknowledgement to Ian K for once upon a time enthusiastically introducing me to Emacs, something I always try to pass on to my non-Emacs using friends and colleagues)_
+
 
 Table of Contents
 =================
 
    * [Table of Contents](#table-of-contents)
-   * [Overview](#overview)
+   * [How to setup dfrib's basic Emacs environment](#how-to-setup-dfribs-basic-emacs-environment)
+      * [Background](#background)
+      * [Overview](#overview)
    * [Installing pre-requisites](#installing-pre-requisites)
       * [Installing pre-requisites for the core packages](#installing-pre-requisites-for-the-core-packages)
          * [CMake-IDE/RTags](#cmake-idertags)
@@ -23,21 +25,31 @@ Table of Contents
       * [Installing irony-server](#installing-irony-server)
          * [Alternatively (less recommended), use company-rtags for code completion](#alternatively-less-recommended-use-company-rtags-for-code-completion)
       * [Trying it all out](#trying-it-all-out)
-   * [Launching the RTags daemon (rdm) prior to Emacs - tmux example](#launching-the-rtags-daemon-rdm-prior-to-emacs---tmux-example)
+   * [TODO:s](#todos)
+      * [Launching the RTags daemon (rdm) prior to Emacs - tmux example](#launching-the-rtags-daemon-rdm-prior-to-emacs---tmux-example)
+      * [Look into cquery with lsp-mode and company-lsp](#look-into-cquery-with-lsp-mode-and-company-lsp)
+   * [Contributing](#contributing)
+   * [Acknowledgements](#acknowledgements)
 
-# Overview
+# How to setup dfrib's basic Emacs environment
 
-**Recently tested for Emacs 25.3.2, at Ubuntu Xenial (16.04)**
+_(Recently tested for Emacs 25.3.2, at Ubuntu Xenial (16.04))_
+
+## Background
 
 This document describes how to setup my Emacs environment, which is mainly targeted for C++ development in CMake projects under Git version control.
+
+It is intended to be a somewhat exhaustive guide aimed towards Emacs(/Linux) beginners, hopefully easing the work of setting a basic Emacs C++/IDE-ish environment. I've experienced that this start-up phase can prove to be a barrier for actually dwelling into the wonders of Emacs, causing Emacs novice users to refrain from using Emacs beyond the scope of an unfamilar "editor".
+
+## Overview
 
 The core packages of my setup are:
 
 - [`cmake-ide`](https://github.com/atilaneves/cmake-ide) with [`rtags`](https://github.com/Andersbakken/rtags) for IDE-like features on Emacs for CMake projects.
-  - Where `rtags` fall back on clang as C++ parser.
+  - Where `rtags` fall back on [`clang`](https://clang.llvm.org/) as C++ parser.
   - Using [`flycheck`](https://github.com/flycheck/flycheck) for on-the-fly syntax checking.
   - Combined with [`company-mode`](http://company-mode.github.io/) and [`irony-mode`](https://github.com/Sarcasm/irony-mode) (and clang parsing) for code completion.
-- [`magit`](https://magit.vc/) for any kind of Git interaction. `magit` is such an awesome Git client that I even recommend my non-Emacs-colleagues to turn to Emacs/`magit` solely for using Git (sneakily allowing to possibly tempt them to get into all other, never-ending additional upsides of using Emacs).
+- [`magit`](https://magit.vc/) for any kind of Git interaction. `magit` is such an awesome Git client that I even sincerely recommend my non-Emacs-colleagues to turn to Emacs/`magit` _solely_ for using Git (naturally sneakily allowing to possibly tempt them to get into all other, never-ending additional upsides of using Emacs).
 - [`ivy`](https://github.com/abo-abo/swiper) for minibuffer code completion.
 
 Some other convenience packages worth mentioning (as they require Emacs-external dependencies).
@@ -56,7 +68,7 @@ Finally, I use [`cask`](http://cask.readthedocs.io/en/latest/index.html) to mana
 
 ### CMake-IDE/RTags
 
-Before we start, resync APT package index files:
+Before we start, resync the package index files for APT:
 
 ```
 $ sudo apt-get update
@@ -87,7 +99,7 @@ Next up, we install clang and llvm. For Ubuntu Xenial, at the time of writing, `
 $ sudo apt-get install clang-4.0 llvm-4.0 libclang-4.0-dev clang-format-4.0
 ```
 
-You might also want to update to use `clang-4.0` to provide for `/usr/bin/clang` (which may be entirely missing now):
+You might also want to update to use `clang-4.0` to provide for `/usr/bin/clang` (which may be pointing to and older clang or missing entirely):
 
 ```
 $ sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-4.0 100 \
@@ -103,7 +115,7 @@ Otherwise Emacs might prompt you that `clang` (or e.g. `clang-format`) cannot be
 
 #### RTags/rdm (RTags daemon)
 
-Clone the RTags project; I usually clone to open source repos into my `~/opensource` folder:
+Clone the RTags project; I usually clone open source repos into my `~/opensource` folder:
 
 ```
 $ cd ~/opensource
@@ -124,9 +136,9 @@ $ sudo make install
 
 ### Ivy
 
-`ivy` contains a lot of goodies, but to point out some specifics, I use `ivy` primarily for `swiper` in-buffer search and for the `counsel` (`ivy`-enhanced) Emacs commands. For the latter, most frequently `counsel-git` (find tracked file in current repo), `counsel-git-grep` and `counsel-ag`. The latter make use of [`ag` - The Silver Searcher](https://github.com/ggreer/the_silver_searcher), and is useful when wanting to search through only parts of a repository, limited to a folder and all tracked file therein (recursively for all sub-folders).
+`ivy` contains a lot of goodies, but to point out some specifics I use `ivy` primarily for `swiper` in-buffer search and for the `counsel` (`ivy`-enhanced) Emacs commands. For the latter, most frequently `counsel-git` (find tracked file in current repo), `counsel-git-grep` and `counsel-ag`. The latter make use of [`ag` - The Silver Searcher](https://github.com/ggreer/the_silver_searcher), and is useful when wanting to search through only parts of a repository, limited to a folder and all tracked file therein (recursively for all sub-folders).
 
-To use `counsel-ag`, install `ag`:
+To allow using `counsel-ag`, install `ag`:
 
 ```
 $ sudo apt-get install silversearcher-ag
@@ -152,7 +164,7 @@ $ ./install.sh
 
 ### PlantUML-mode
 
-To make use of PlantUML-mode for UML diagram generation within Emacs, naturally we need to download the latest [`plantuml.jar`](http://plantuml.com/download). I usually place mine in `~/opensource/plantuml/`.
+To make use of PlantUML-mode for UML diagram generation within Emacs, naturally we need to download the latest [`plantuml.jar`](http://plantuml.com/download). I've placed my copy in `~/opensource/plantuml/`.
 
 
 # Installing Emacs 25
@@ -175,7 +187,7 @@ Ascertain, after installation, that you're not using an older version:
 $ emacs --version # 25.X.Y?
 ```
 
-I usually make sure to remove any older versions; packages `emacsXY`/`emacsXY-...` which is not `emacs25`. To identify such packages, study the output of:
+I usually also make sure to remove any older versions; packages `emacsXY`/`emacsXY-...` which is not `emacs25`. To identify such packages, study the output of:
 
 ```
 $ dpkg --get-selections | grep emacs
@@ -183,7 +195,7 @@ $ dpkg --get-selections | grep emacs
 
 Or just tab-complete `sudo apt-get remove ...`.
 
-To remove said packages:
+To remove said packages use `apt-get remove --purge` (or just `apt-get purge`):
 
 ```
 $ sudo apt-get remove --purge emacsXY
@@ -193,7 +205,7 @@ $ sudo apt-get remove --purge emacsXY-...
 
 # Installing and setting up Cask
 
-Before installing Cask, make sure that you `EMACS` environment variable pointa to the same Emacs version as your `emacs` command.
+Before installing Cask, make sure that the `EMACS` environment variable points to the same Emacs version as your `emacs` command.
 
 ```
 $ emacs --version
@@ -206,7 +218,7 @@ Is this is not a match, re-try in a new terminal window.
 
 ## Installing cask
 
-To install Cask, run the follwing command:
+To install Cask, run the following command:
 
 ```
 $ curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
@@ -221,7 +233,7 @@ export PATH="/home/dfri/.cask/bin:$PATH"
 
 ## Setting up a Cask project file for your Emacs configuration
 
-Copy the `/.emacs.d/Cask` file of this repo to you local `~/.emacs.d/`. If the `~/.emacs.d/` folder is missing, create it or simply start/close `emacs` once to let it be created automatically.
+Copy the `/.emacs.d/Cask` file of this repo to you local `~/.emacs.d/` folder. If the `~/.emacs.d/` folder is missing, create it or simply start/close `emacs` once to let it be created automatically.
 
 Moreover, create a (temporary) `init.el` file in your local `~/.emacs.d/` folder with the following content:
 
@@ -244,7 +256,7 @@ $ cask install
 
 # Setting up Emacs
 
-Replace the dummy `init.el` file from the step above with the `/.emacs.d/init.el` file of this repo. You might need to modify the `cmake-ide-build-dir` and `rtags-path` paths in `init.el` file; they are both set to `~/opensource/rtags/build` by default.
+Replace the dummy `init.el` file from the step above with the `/.emacs.d/init.el` file of this repo. You might need to modify the `cmake-ide-build-dir` and `rtags-path` paths in the `init.el` file; they are both set to `~/opensource/rtags/build` by default.
 
 ## Installing irony-server
 
@@ -254,32 +266,49 @@ Upon first Emacs launch, install the `irony-server`, which provides the `libclan
 # In Emacs
 M-x irony-install-server
 # yields a cmake install command -> accept [RET]
-
 ```
 
 A successful installation prompts you with _"`irony-server` installed successfully!"_.
 
 ### Alternatively (less recommended), use company-rtags for code completion
 
-As an alternative to using `irony` for code completion, `rtags` can be used also here (i.e., not only for navigation and syntax checking), via its `company` backend `company-rtags`. In this case, you needn't install the `irony-server` above, but can fall back on the `rdm` deamon for a `libclang` interface. This will load `company-rtags` rather than `company-irony` as `company` backend; you will see these lines commented out in the `Cask` file as well as in `init.el`. Remember to re-install the Cask dependencies if you update the `Cask` file.
+`rtags` (currently used for navigation and syntax checking) can be used as an alternative to `irony` for code completion, via its `company` backend `company-rtags`. In this case, you needn't install the `irony-server` above, but can fall back on the `rdm` deamon for a `libclang` interface. This will load `company-rtags` rather than `company-irony` as `company` backend; you will see such a setup commented out in the `Cask` file as well as in `init.el` file. Remember to re-install the Cask dependencies if you update the `Cask` file, as well as disabling `irony` as the code completion engine.
 
-Note though that I would recommend using `irony` for completion; , I've had had better experience with it, as I get the feeling `rtags` is somewhat slower.
+I would recommend using `irony` for completion, though, as I've had had better experience with it. I get the feeling that `rtags` is somewhat slower, but more stable (e.g. if running `emacs` and `irony-server` for a long time).
 
 ## Trying it all out
 
-A good place to start trying out Emacs/CMake-IDE/RTags setup is in the `rtags` repo that we already cloned above as part of installing RTags, as it covers a C++ CMake project (visit e.g. `rtags/src/rdm.cpp`.
+A good place to start trying out our Emacs/CMake-IDE/RTags setup is in the `rtags` repo that we already cloned above as part of installing RTags, as it covers a C++ CMake project (visit e.g. `rtags/src/rdm.cpp`).
 
-Prior to launching `rdm` and `emacs` for this venture, make sure there is a `compile_commands.json` file present in the root for the project (under `rtags/`). You might possibly need to move the `compile_commands.json` file from `rtags/build` to `rtags/`. If you can't find it in `build`, one can be generated directly into repo root using `cmake`:
+Prior to launching `rdm` and `emacs` for this venture, make sure there is a `compile_commands.json` file present in the root for the project (`rtags/`). You might possibly need to copy the `compile_commands.json` file from `rtags/build/` to `rtags/`. If you can't find it in `build`, one can be generated directly into repo root using `cmake`:
 
 ```
 $ cd ~/opensource/rtags/
 $ cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 .
 ```
 
-The `rdm` deamon can also be started from within Emacs, using e.g. the `(rtags-start-process-unless-running)` function, but I've had better experience in launching `rdm` prior to (and external from) `emacs`, e.g. using `tmux` (see next section). This command is present in the `init.el` file of this repo, but has been commented out.
+The `rdm` deamon can also be started from within Emacs, using e.g. the `(rtags-start-process-unless-running)` function, but I've had better experience in launching `rdm` prior to (and external from) `emacs`, e.g. using `tmux` (see next section). The `(rtags-start-process-unless-running)` command is present in the `init.el` file of this repo, but has been commented out.
 
-Happy exploring of Emacs!
+That should be it. Good luck!
 
-# Launching the RTags daemon (rdm) prior to Emacs - tmux example
+# TODO:s
 
-TODO: Describe how to use e.g. `tmux` to automatically start `rdm` (with `--no-filemanager`) prior to launching Emacs.
+## Launching the RTags daemon (rdm) prior to Emacs - tmux example
+
+_**TODO:**_
+
+Describe how to use e.g. [`tmux`](https://github.com/tmux/tmux/wiki) to automatically start `rdm` (with `--no-filemanager`) prior to launching Emacs.
+
+## Look into cquery with lsp-mode and company-lsp
+
+_**TODO:**_
+
+Look into testing [`cquery`](https://github.com/jacobdufault/cquery) with [`lsp-mode`](https://github.com/emacs-lsp/lsp-mode) and [`company-lsp`](https://github.com/tigersoldier/company-lsp) as an alternative to `rtags` and `company-irony`/`company-rtags`. `cquery` is still in its early phases, especially w.r.t. using it with Emacs, but it looks very promising. One can follow the work of `cquery` (and keep one's eye out for Emacs related successes) in [the Gitter lobby of the `cquery-project`](https://gitter.im/cquery-project/Lobby).
+
+# Contributing
+
+I'm neither an Emacs hacker nor proficient in elisp, and will thus happily receive pull requests to improve this guide, e.g. re-formatting the `init.el` file to "best Emacs Lisp practicecs", or removing possible redundant information or steps above. I'd like to avoid, though, expanding with additional packages and modes, as the Emacs setup covered herein is my own turn-to guide for setting up my personally flavoured "minimal" Emacs setup.
+
+# Acknowledgements
+
+To Ian K for once upon a time enthusiastically introducing me to Emacs, something I always try to pass on to my non-Emacs using friends and colleagues.

@@ -94,7 +94,6 @@
 (setq rtags-autostart-diagnostics t)
 (rtags-diagnostics)
 
-
 ;; Enable code completion in Emacs with rtags & company mode.
 ;-> use irony for completions
 
@@ -273,6 +272,17 @@
 (require 'expand-region)
 (global-set-key (kbd "C-q") 'er/expand-region)
 ; overwrite binding to insert non-graphic characters (I never use that)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; idle highlight mode
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun idle-highlight-mode-hook ()
+  (make-local-variable 'column-number-mode)
+  (column-number-mode t)
+  (idle-highlight-mode t))
+
+(add-hook 'emacs-lisp-mode-hook 'idle-highlight-mode-hook)
+(add-hook 'c-mode-common-hook 'idle-highlight-mode-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; babel & PlantUML
