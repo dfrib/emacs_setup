@@ -173,9 +173,14 @@ In case you're not already running an Emacs 25 version:
 $ emacs --version # 25?
 ```
 
-Then install it. Emacs 25 is readily available via the APT package manager for Ubuntu:
+Then install it. To install a stable Emacs 25, use e.g. [Kevin Kelley's PPA](https://launchpad.net/~kelleyk/+archive/ubuntu/emacs):
 
 ```bash
+# add PPA
+$ sudo add-apt-repository ppa:kelleyk/emacs
+
+# update APT and install (stable) emacs25
+$ sudo apt-get update
 $ sudo apt-get install emacs25
 ```
 
@@ -203,17 +208,6 @@ $ sudo apt-get remove --purge emacsXY-...
 
 # Installing and setting up Cask
 
-Before installing Cask, make sure that the `EMACS` environment variable points to the same Emacs version as your `emacs` command.
-
-```bash
-$ emacs --version
-
-# this must be the same version
-$ echo $EMACS
-```
-
-Is this is not a match, re-try in a new terminal window.
-
 ## Installing cask
 
 To install Cask, run the following command:
@@ -231,7 +225,7 @@ export PATH="/home/dfri/.cask/bin:$PATH"
 
 ## Setting up a Cask project file for your Emacs configuration
 
-Copy the `/.emacs.d/Cask` file of this repo to you local `~/.emacs.d/` folder. If the `~/.emacs.d/` folder is missing, create it or simply start/close `emacs` once to let it be created automatically.
+The `emacs_setup` repo in which this `README.md` is a member also contains an `/.emacs.d/` folder. Copy the `/.emacs.d/Cask` file from this repo into your local `~/.emacs.d/` folder. If the `~/.emacs.d/` folder is missing, create it or simply start/close `emacs` once to let it be created automatically.
 
 Moreover, create a (temporary) `init.el` file in your local `~/.emacs.d/` folder with the following content:
 
@@ -247,9 +241,10 @@ $ touch init.el
 
 ```
 
-and thereafter install all dependencies:
+Your local `~/.emacs.d/` folder should now contain a `Cask` and an `init.el` file. Use `cask` to install all package dependencies contained in the `Cask` file:
 
 ```bash
+$ cd ~/.emacs.d/
 $ cask install
 ```
 
@@ -284,7 +279,15 @@ Prior to launching `rdm` and `emacs` for this venture, make sure there is a `com
 ```bash
 $ cd ~/opensource/rtags/
 $ cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 .
+
+# start rdm deamon (I've hade better experience using the --no-filemanager flag)
+$ rdm --no-filemanager &
+
+# start Emacs
+$ emacs
 ```
+
+If the `rdm` command is not found, you might possible need to add `~/opensrc/rtags/build/bin` to your `$PATH` variable; alternatively simply run `~/opensrc/rtags/build/bin/rdm --no-filemanager &` above to get the tryout going.
 
 The `rdm` deamon can also be started from within Emacs, using e.g. the `(rtags-start-process-unless-running)` function, but I've had better experience in launching `rdm` prior to (and external from) `emacs`, e.g. using `tmux` (see next section). The `(rtags-start-process-unless-running)` command is present in the `init.el` file of this repo, but has been commented out.
 
@@ -294,9 +297,37 @@ That should be it. Good luck!
 
 ## Launching the RTags daemon (rdm) prior to Emacs - tmux example
 
-_**TODO:**_
+You can use e.g. [`tmux`](https://github.com/tmux/tmux/wiki) to automatically start `rdm` (with `--no-filemanager`) prior to launching Emacs, e.g. keeping the rdm output in a minor pane to get a feeling of `rdm`'s "state" in case Emacs feezes up.
 
-Describe how to use e.g. [`tmux`](https://github.com/tmux/tmux/wiki) to automatically start `rdm` (with `--no-filemanager`) prior to launching Emacs.
+E.g., create a `dev-tmux.sh` file that can be used to start up your dev environment:
+
+```bash
+#!/bin/sh
+tmux new-session -s 'emacs' -d 'rdm -v --no-filemanager'
+tmux split-window -h
+tmux resize-pane -L 40
+tmux select-pane -L
+tmux split-window -v
+tmux resize-pane -U 10
+tmux select-pane -R
+tmux new-window -d 'emacs25 --visit "/path/to/root/of/your/project/"'
+tmux -2 attach-session -d
+```
+
+Yielding, roughly:
+
+```
+---------------------------------
+|           |                   |
+|  rdm log  |                   |
+|           |                   |
+|-----------|   main terminal   |  +  Emacs @ /path/to/root/of/your/project/
+|           |                   |
+| secondary |                   |
+| terminal  |                   |
+|           |                   |
+---------------------------------
+```
 
 ## Look into cquery with lsp-mode and company-lsp
 
@@ -306,7 +337,7 @@ Look into testing [`cquery`](https://github.com/jacobdufault/cquery) with [`lsp-
 
 # Contributing
 
-I'm neither an Emacs hacker nor proficient in elisp, and will thus happily receive pull requests to improve this guide, e.g. re-formatting the `init.el` file to "best Emacs Lisp practicecs", or removing possible redundant information or steps above. I'd like to avoid, though, expanding with additional packages and modes, as the Emacs setup covered herein is my own turn-to guide for setting up my personally flavoured "minimal" Emacs setup.
+I'm neither an Emacs hacker nor proficient in elisp, and will thus happily receive pull requests to improve this guide, e.g. re-formatting the `init.el` file to "best Emacs Lisp practices", or removing possible redundant information or steps above. I'd like to avoid, though, expanding with additional packages and modes, as the Emacs setup covered herein is my own turn-to guide for setting up my personally flavoured "minimal" Emacs setup.
 
 # Acknowledgements
 
