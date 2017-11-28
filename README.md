@@ -1,5 +1,3 @@
-
-
 Table of Contents
 =================
 
@@ -24,10 +22,11 @@ Table of Contents
       * [Installing irony-server](#installing-irony-server)
          * [Alternatively (less recommended), use company-rtags for code completion](#alternatively-less-recommended-use-company-rtags-for-code-completion)
       * [Trying it all out](#trying-it-all-out)
-   * [TODO:s](#todos)
+   * [Extras](#extras)
       * [Launching the RTags daemon (rdm) prior to Emacs - tmux example](#launching-the-rtags-daemon-rdm-prior-to-emacs---tmux-example)
+   * [TODO:s](#todos)
       * [Look into cquery with lsp-mode and company-lsp](#look-into-cquery-with-lsp-mode-and-company-lsp)
-   * [Contributing](#contributing)
+   * [Contributing](contributing)
    * [Acknowledgements](#acknowledgements)
 
 # How to setup dfrib's basic Emacs environment
@@ -293,11 +292,11 @@ The `rdm` deamon can also be started from within Emacs, using e.g. the `(rtags-s
 
 That should be it. Good luck!
 
-# TODO:s
+# Extras
 
 ## Launching the RTags daemon (rdm) prior to Emacs - tmux example
 
-You can use e.g. [`tmux`](https://github.com/tmux/tmux/wiki) to automatically start `rdm` (with `--no-filemanager`) prior to launching Emacs, e.g. keeping the rdm output in a minor pane to get a feeling of `rdm`'s "state" in case Emacs feezes up.
+You can use e.g. [`tmux`](https://github.com/tmux/tmux/wiki) to automatically start `rdm` (with `--no-filemanager`) prior to launching Emacs, e.g. keeping the rdm output in a minor pane to get a feeling of `rdm`'s "state" in case Emacs freezes up.
 
 E.g., create a `dev-tmux.sh` file that can be used to start up your dev environment:
 
@@ -328,6 +327,8 @@ Yielding, roughly:
 |           |                   |
 ---------------------------------
 ```
+
+# TODO:s
 
 ## Look into cquery with lsp-mode and company-lsp
 
