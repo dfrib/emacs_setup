@@ -68,6 +68,9 @@
 ;; Protobuf
 (add-to-list 'auto-mode-alist '("\\.proto\\'" . protobuf-mode))
 
+;; Protobuf
+(add-to-list 'auto-mode-alist '("\\.swift\\'" . swift-mode))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; cmake ide & rtags
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

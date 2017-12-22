@@ -24,6 +24,7 @@
 (depends-on "flycheck-color-mode-line")
 (depends-on "flycheck-pos-tip")
 (depends-on "flycheck-plantuml")
+(depends-on "flycheck-swift")
 
 ;; formatting (google style / clang format)
 (depends-on "clang-format")
@@ -44,6 +45,7 @@
 (depends-on "markdown-mode")
 (depends-on "plantuml-mode")
 (depends-on "protobuf-mode")
+(depends-on "swift-mode")
 
 ;; use-package (isolated package configurations)
 (depends-on "use-package")
