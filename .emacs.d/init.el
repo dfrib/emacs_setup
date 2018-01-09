@@ -129,6 +129,7 @@
   )
 
 (use-package cmake-ide
+  :after rtags
   :config
   ;; set path to project build directory
   (setq cmake-ide-build-dir
@@ -254,6 +255,29 @@
 
 ;; Autoindent using google style guide
 (add-hook 'c-mode-common-hook 'google-make-newline-indent)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; elpy (python IDE-ish features)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package elpy
+  :after company flycheck
+  :init (defun goto-def-or-rgrep ()
+          "Go to definition of thing at point or do an rgrep in project if that fails"
+          (interactive)
+          (condition-case nil (elpy-goto-definition)
+            (error (elpy-rgrep-symbol (thing-at-point 'symbol)))))
+  ;; Custom keybindings.
+  :bind (("<home>" . 'goto-def-or-rgrep)
+         ("<prior>" . 'pop-tag-mark)
+         ("<next>" . 'elpy-goto-definition))
+
+  :config
+  (elpy-enable)
+  ;; Use flycheck not flymake with elpy.
+  (when (require 'flycheck nil t)
+    (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+    (add-hook 'elpy-mode-hook 'flycheck-mode))
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ivy-mode

@@ -3,7 +3,7 @@
 
 ;; Cask
 (depends-on "cask")
-(depends-on "cask-mode") 
+(depends-on "cask-mode")
 
 ;; --- cmake-ide with rtags/company/irony/flycheck
 (depends-on "cmake-ide")
@@ -19,6 +19,9 @@
 ;; alternatives: company-rtags for completion, irony for syntax checking
 ;(depends-on "company-rtags")
 ;(depends-on "flycheck-irony")
+
+;; --- elpy for python IDE-ish features
+(depends-on "elpy")
 
 ;; other flycheck modes
 (depends-on "flycheck-color-mode-line")
