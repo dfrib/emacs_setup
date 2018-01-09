@@ -12,9 +12,13 @@
 (package-initialize)
 
 ;; -------------------------------------------------------------------------- ;;
-;; cask
+;; cask - packet management
 (require 'cask "~/.cask/cask.el")
 (cask-initialize)
+
+;; -------------------------------------------------------------------------- ;;
+;; use-package
+(require 'use-package)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Basic behaviour and appearance
@@ -45,159 +49,186 @@
 (setq inhibit-startup-message t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; auto-mode-alist adjustments
+;; major modes
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Cask
-(add-to-list 'auto-mode-alist '("Cask" . cask-mode))
+(use-package cask-mode
+  :mode "Cask"
+  )
 
 ;; C++
-(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
-(add-to-list 'auto-mode-alist '("\\.cc\\'" . c++-mode))
-(add-to-list 'auto-mode-alist '("\\.cpp\\'" . c++-mode))
+(use-package c++-mode
+  :mode (("\\.h\\'" . c++-mode)
+         ("\\.cc\\'" . c++-mode)
+         ("\\.cpp\\'" . c++-mode))
+  )
 
 ;; CMake
-(add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
-(add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
+(use-package cmake-mode
+  :mode (("CMakeLists\\.txt\\'" . cmake-mode)
+         ("\\.cmake\\'" . cmake-mode))
+  )
 
 ;; Docker
-(add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode))
+(use-package docker-mode
+  :mode "Dockerfile\\'"
+  )
 
 ;; PlantUML
-(add-to-list 'auto-mode-alist '("\\.plantuml\\'" . plantuml-mode))
+(use-package plantuml-mode
+  :mode "\\.plantuml\\'"
+  :config (setq plantuml-jar-path
+                (expand-file-name "~/opensource/plantuml/plantuml.jar"))
+  )
 
 ;; Protobuf
-(add-to-list 'auto-mode-alist '("\\.proto\\'" . protobuf-mode))
+(use-package protobuf-mode
+  :mode "\\.proto\\'"
+  )
 
-;; Protobuf
-(add-to-list 'auto-mode-alist '("\\.swift\\'" . swift-mode))
+;; Swift
+(use-package swift-mode
+  :mode "\\.swift\\'"
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; cmake ide & rtags
+;; rtags & cmake ide
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'rtags)
+(use-package rtags
+  ;; Custom keybindings.
+  :bind (("<home>" . 'rtags-find-symbol-at-point)
+         ("<prior>" . 'rtags-location-stack-back)
+         ("<next>" . 'rtags-location-stack-forward))
 
-;; set path to project build directory
-(setq cmake-ide-build-dir
-      (expand-file-name "~/opensource/rtags/build"))
-;; CURRENTLY: hardcode to build dir of default project
-;; TODO: fix via .dir-locals.el
+  :config
+  ;; Set path to rtag executables.
+  (setq rtags-path
+        (expand-file-name "~/opensource/rtags/build"))
+  ;;
+  ;; Start the rdm process unless the process is already running.
+  ;; --> Launch rdm externally and prior to Emacs instead.
+  ;; (rtags-start-process-unless-running)
+  ;;
+  ;; Enable rtags-diagnostics.
+  (setq rtags-autostart-diagnostics t)
+  (rtags-diagnostics)
+  ;;
+  ;; Timeout for reparse on onsaved buffers.
+  (rtags-set-periodic-reparse-timeout 0.5)
+  ;;
+  ;; Rtags standard keybindings ([M-. on symbol to go to bindings]).
+  (rtags-enable-standard-keybindings)
+  ;;
+  ;; Enable completions in with rtags & company mode
+  ;; -> use irony for completions
+  ;;(setq rtags-completions-enabled t)
+  ;;(require 'company)
+  ;;(global-company-mode)
+  ;;(push 'company-rtags company-backends) ; Add company-rtags to company-backends
+  ;;
+  )
 
-;; set path to rtag executables
-(setq rtags-path
-      (expand-file-name "~/opensource/rtags/build"))
-
-;; invoke cmake-ide setup
-(cmake-ide-setup)
-
-;; start the rdm process unless the process is already running.
-;; (I prefer to launch rdm externally and prior to Emacs)
-;(rtags-start-process-unless-running)
-
-;; Enable rtags-diagnostics.
-(setq rtags-autostart-diagnostics t)
-(rtags-diagnostics)
-
-;; Enable code completion in Emacs with rtags & company mode.
-;-> use irony for completions
-
-;; Enable completions in rtags.
-;(setq rtags-completions-enabled t)
-;-> use irony for completions
-
-;; Enable company mode
-;(require 'company)
-;(global-company-mode)
-;-> use irony for completions
-
-;; Add company-rtags to company-backends
-;(push 'company-rtags company-backends)
-;-> use irony for completions
-
-;; Timeout for reparse on onsaved buffers
-(rtags-set-periodic-reparse-timeout 0.5)
-
-;; Rtags standard keybindings ([M-. on symbol to go to bindings])
-(rtags-enable-standard-keybindings)
-
-;; Custom keybindings
-(global-set-key (kbd "<home>") 'rtags-find-symbol-at-point)
-(global-set-key (kbd "<prior>") 'rtags-location-stack-back)
-(global-set-key (kbd "<next>") 'rtags-location-stack-forward)
+(use-package cmake-ide
+  :config
+  ;; set path to project build directory
+  (setq cmake-ide-build-dir
+        (expand-file-name "~/src/stringent/build"))
+  ;; CURRENTLY: hardcode to build dir of default project
+  ;; TODO: fix via .dir-locals.el
+  ;;
+  ;; invoke cmake-ide setup
+  (cmake-ide-setup)
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; flycheck-mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package flycheck
-  :ensure t
-  :init (global-flycheck-mode))
+  :init (global-flycheck-mode)
+  )
 
-;; color model line
-(require 'flycheck-color-mode-line)
-(with-eval-after-load 'flycheck
-  '(add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode))
+;; Color mode line for errors.
+(use-package flycheck-color-mode-line
+  :after flycheck
+  :config '(add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode)
+  )
 
-;; show pos-tip popups for errors
-(with-eval-after-load 'flycheck
-  (flycheck-pos-tip-mode))
+;; Show pos-tip popups for errors.
+(use-package flycheck-pos-tip
+  :after flycheck
+  :config (flycheck-pos-tip-mode)
+  )
 
-;; rtags with Flycheck (syntax checking)
-(require 'flycheck-rtags)
-(defun my-flycheck-rtags-setup ()
-  (flycheck-select-checker 'rtags)
-  (setq-local flycheck-highlighting-mode nil) ;; RTags creates more accurate overlays.
-  (setq-local flycheck-check-syntax-automatically nil))
-(add-hook 'c-mode-hook #'my-flycheck-rtags-setup)
-(add-hook 'c++-mode-hook #'my-flycheck-rtags-setup)
-(add-hook 'objc-mode-hook #'my-flycheck-rtags-setup)
+;; Flycheck rtags.
+(use-package flycheck-rtags
+  :after rtags
+  :config
+  (defun my-flycheck-rtags-setup ()
+    (flycheck-select-checker 'rtags)
+    (setq-local flycheck-highlighting-mode nil) ;; RTags creates more accurate overlays.
+    (setq-local flycheck-check-syntax-automatically nil))
+  (add-hook 'c-mode-hook #'my-flycheck-rtags-setup)
+  (add-hook 'c++-mode-hook #'my-flycheck-rtags-setup)
+  (add-hook 'objc-mode-hook #'my-flycheck-rtags-setup))
 
-;; flycheck-plantuml
-(with-eval-after-load 'flycheck
-  (require 'flycheck-plantuml)
-  (flycheck-plantuml-setup))
+;; Flycheck-plantuml/
+(use-package flycheck-plantuml
+  :after flycheck
+  :config (flycheck-plantuml-setup)
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; irony (C/C++ minor mode powered by libclang) and company for completions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(add-hook 'c++-mode-hook 'irony-mode)
-(add-hook 'c-mode-hook 'irony-mode)
-;(add-hook 'objc-mode-hook 'irony-mode)
-(add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-
-;; replace the `completion-at-point' and `complete-symbol' bindings in
-;; irony-mode's buffers by irony-mode's function
-(defun my-irony-mode-hook ()
+(use-package irony
+  :config
+  (add-hook 'c-mode-hook 'irony-mode)
+  (add-hook 'c++-mode-hook 'irony-mode)
+  (add-hook 'objc-mode-hook 'irony-mode)
+  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+  (defun my-irony-mode-hook ()
   (define-key irony-mode-map [remap completion-at-point]
     'irony-completion-at-point-async)
   (define-key irony-mode-map [remap complete-symbol]
     'irony-completion-at-point-async))
-(add-hook 'irony-mode-hook 'my-irony-mode-hook)
-(add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+  (add-hook 'irony-mode-hook 'my-irony-mode-hook)
+  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+  )
 
-;; Enable company mode
-(require 'company)
-(global-company-mode)
+;; Company mode.
+(use-package company
+  :config (global-company-mode)
+  )
 
-;; company-irony
-(require 'company-irony-c-headers)
-;; Load with `irony-mode` as a grouped backend
-(eval-after-load 'company
+;; company-irony.
+(use-package company-irony
+  :after company
+  :config (global-company-mode)
+  ;; (optional) adds CC special commands to `company-begin-commands' in order to
+  ;; trigger completion at interesting places, such as after scope operator
+  ;;     std::|
+  (add-hook 'irony-mode-hook 'company-irony-setup-begin-commands)
+  )
+
+;; Company-mode backend for C/C++ header files that works with irony-mode.
+;; Complementary to company-irony by offering completion suggestions to header files.
+(use-package company-irony-c-headers
+  :after company-irony
+  :config
+  ;; Load with `irony-mode` as a grouped backend
+  (eval-after-load 'company
   '(add-to-list
     'company-backends '(company-irony-c-headers company-irony)))
-
-;; (eval-after-load 'company
-;;   '(add-to-list 'company-backends 'company-irony))
-
-;; (optional) adds CC special commands to `company-begin-commands' in order to
-;; trigger completion at interesting places, such as after scope operator
-;;     std::|
-(add-hook 'irony-mode-hook 'company-irony-setup-begin-commands)
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; clang-format
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; clang-format can be triggered using C-M-tab
-(require 'clang-format)
-(global-set-key [C-M-tab] 'clang-format-region)
+(use-package clang-format
+  :config (global-set-key [C-M-tab] 'clang-format-region)
+  )
+
 ;; If the repo does not have a .clang-format files, one can
 ;; be created using google style:
 ;; clang-format -style=google -dump-config > .clang-format
@@ -219,13 +250,6 @@
   (c-set-style "my-style")        ; use my-style defined above
   (auto-fill-mode))
 
-;; ;; also toggle on auto-newline and hungry delete minor modes
-;; (defun my-c++-mode-hook ()
-;;   (c-set-style "my-style")        ; use my-style defined above
-;;   (auto-fill-mode)
-;;   (c-toggle-auto-hungry-state 1))
-
-
 (add-hook 'c++-mode-hook 'my-c++-mode-hook)
 
 ;; Autoindent using google style guide
@@ -234,79 +258,99 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ivy-mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(ivy-mode)
-(setq ivy-use-virtual-buffers t)
-(setq enable-recursive-minibuffers t)
-
-;; Ivy integration with rtags
-;(setq rtags-display-result-backend 'ivy)
+(use-package ivy
+  :config
+  (ivy-mode)
+  (setq ivy-use-virtual-buffers t)
+  (setq enable-recursive-minibuffers t)
+  ;; Ivy integration with rtags.
+  ;;(setq rtags-display-result-backend 'ivy)
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; counsel keyboard mappings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'ag)
-(global-set-key (kbd "<f9>") 'counsel-load-theme) ;; Quick theme selection.
-(global-set-key "\C-s" 'swiper)
-(global-set-key (kbd "C-c C-r") 'ivy-resume)
-(global-set-key (kbd "<f6>") 'ivy-resume)
-(global-set-key (kbd "M-x") 'counsel-M-x)
-(global-set-key (kbd "C-x C-f") 'counsel-find-file)
-(global-set-key (kbd "<f1> f") 'counsel-describe-function)
-(global-set-key (kbd "<f1> v") 'counsel-describe-variable)
-(global-set-key (kbd "<f1> l") 'counsel-find-library)
-(global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
-(global-set-key (kbd "<f2> u") 'counsel-unicode-char)
-(global-set-key (kbd "C-c g") 'counsel-git)
-(global-set-key (kbd "C-c j") 'counsel-git-grep)
-(global-set-key (kbd "C-c k") 'counsel-ag)
-(global-set-key (kbd "C-x l") 'counsel-locate)
-(global-set-key (kbd "C-x g") 'magit-status)
-(define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
+(use-package ag)
+(use-package counsel
+  :after ag
+  :config
+  (global-set-key (kbd "<f9>") 'counsel-load-theme) ;; Quick theme selection.
+  (global-set-key "\C-s" 'swiper)
+  (global-set-key (kbd "C-c C-r") 'ivy-resume)
+  (global-set-key (kbd "<f6>") 'ivy-resume)
+  (global-set-key (kbd "M-x") 'counsel-M-x)
+  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+  (global-set-key (kbd "<f1> f") 'counsel-describe-function)
+  (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
+  (global-set-key (kbd "<f1> l") 'counsel-find-library)
+  (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
+  (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
+  (global-set-key (kbd "C-c g") 'counsel-git)
+  (global-set-key (kbd "C-c j") 'counsel-git-grep)
+  (global-set-key (kbd "C-c k") 'counsel-ag)
+  (global-set-key (kbd "C-x l") 'counsel-locate)
+  (global-set-key (kbd "C-x g") 'magit-status)
+  (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; drag stuff
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(drag-stuff-global-mode 1)
-(drag-stuff-define-keys)
+(use-package drag-stuff
+  :config
+  (drag-stuff-global-mode 1)
+  (drag-stuff-define-keys)
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; expand region
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(require 'expand-region)
-(global-set-key (kbd "C-q") 'er/expand-region)
-; overwrite binding to insert non-graphic characters (I never use that)
+(use-package expand-region
+  :config
+  ;; Overwrite binding to insert non-graphic characters (I never use that).
+  (global-set-key (kbd "C-q") 'er/expand-region)
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; idle highlight mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun idle-highlight-mode-hook ()
-  (make-local-variable 'column-number-mode)
-  (column-number-mode t)
-  (idle-highlight-mode t))
-
-(add-hook 'emacs-lisp-mode-hook 'idle-highlight-mode-hook)
-(add-hook 'c-mode-common-hook 'idle-highlight-mode-hook)
+(use-package idle-highlight-mode
+  :config
+  (defun idle-highlight-mode-hook ()
+    (make-local-variable 'column-number-mode)
+    (column-number-mode t)
+    (idle-highlight-mode t))
+  (add-hook 'emacs-lisp-mode-hook 'idle-highlight-mode-hook)
+  (add-hook 'c-mode-common-hook 'idle-highlight-mode-hook)
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; babel & PlantUML
+;; org-mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; active Org-babel languages
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '(;; other Babel languages
-   (plantuml . t)))
-
-;; point to plantuml jar
-(setq org-plantuml-jar-path
-      (expand-file-name "~/opensource/plantuml/plantuml.jar"))
+(use-package org
+  :config
+  ;; babel & PlantUML
+  ;; Activate Org-babel languages.
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '(;; other Babel languages
+     (plantuml . t)))
+  ;; Point to plantuml jar.
+  (setq org-plantuml-jar-path
+        (expand-file-name "~/opensource/plantuml/plantuml.jar"))
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; smart mode line
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;(setq sml/theme 'dark)
-(setq sml/theme 'powerline)
-(setq sml/no-confirm-load-theme t)
-(sml/setup)
+(use-package smart-mode-line)
+(use-package smart-mode-line-powerline-theme
+  :after smart-mode-line
+  :config
+  (setq sml/theme 'powerline)
+  (setq sml/no-confirm-load-theme t)
+  (sml/setup)
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; IBuffer
@@ -314,35 +358,36 @@
 ; http://martinowen.net/blog/2010/02/03/tips-for-emacs-ibuffer.html
 ; http://ergoemacs.org/emacs/emacs_buffer_management.html
 ; http://stackoverflow.com/questions/1231188/emacs-list-buffers-behavior
-
-; Use IBuffer instead for buffer list
-(global-set-key (kbd "C-x C-b") 'ibuffer)
-
-;; Bind other-window (and custom prev-window) to more accessible keys
-;; -----------------
-(global-set-key (kbd "C-'") 'other-window)
-(global-set-key (kbd "C-;") 'prev-window)
-(defun prev-window ()
-  (interactive)
-  (other-window -1))
-
-;; define IBuffer filter modes
-(setq ibuffer-saved-filter-groups
-      '(("home"
-         ("emacs-config" (or (filename . ".emacs.d")
-                             (filename . "emacs-config")))
-         ("Org" (or (mode . org-mode)
-                    (filename . "OrgMode")))
-         ("code" (filename . "src"))
-	 ("Magit" (name . "\*magit\*"))
-	 ("Help" (or (name . "\*Help\*")
-		     (name . "\*Apropos\*")
-		     (name . "\*info\*"))))))
-
-;; load filter
-(add-hook 'ibuffer-mode-hook
-	  '(lambda ()
-	     (ibuffer-switch-to-saved-filter-groups "home")))
+(use-package ibuffer
+  :config
+  ;; Use IBuffer instead for buffer list.
+  (global-set-key (kbd "C-x C-b") 'ibuffer)
+  ;;
+  ;; Bind other-window (and custom prev-window) to more accessible keys.
+  (global-set-key (kbd "C-'") 'other-window)
+  (global-set-key (kbd "C-;") 'prev-window)
+  (defun prev-window ()
+    (interactive)
+    (other-window -1))
+  ;;
+  ;; Define IBuffer filter modes.
+  (setq ibuffer-saved-filter-groups
+        '(("home"
+           ("emacs-config" (or (filename . ".emacs.d")
+                               (filename . "emacs-config")))
+           ("Org" (or (mode . org-mode)
+                      (filename . "OrgMode")))
+           ("code" (filename . "src"))
+           ("Magit" (name . "\*magit\*"))
+           ("Help" (or (name . "\*Help\*")
+                       (name . "\*Apropos\*")
+                       (name . "\*info\*"))))))
+  ;;
+;; Load filter.
+  (add-hook 'ibuffer-mode-hook
+            '(lambda ()
+               (ibuffer-switch-to-saved-filter-groups "home")))
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; comint-mode & shell-mode
@@ -385,12 +430,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Themes & visual behaviour
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; theme
-(load-theme 'spolsky t)
-
-;;; font
-(set-frame-font "Meslo LG M DZ for Powerline-10" nil t)
+(use-package sublime-themes
+  :config
+  (load-theme 'spolsky t)
+  (set-frame-font "Meslo LG M DZ for Powerline-10" nil t)
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; The End
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(provide 'init)
+;;; init.el ends here
