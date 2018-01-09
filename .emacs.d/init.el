@@ -48,6 +48,14 @@
 ;; supress welcome screen
 (setq inhibit-startup-message t)
 
+;; Bind other-window (and custom prev-window) to more accessible keys.
+(defun prev-window ()
+  (interactive)
+  (other-window -1))
+(global-set-key (kbd "C-'") 'other-window)
+(global-set-key (kbd "C-;") 'prev-window)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; major modes
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -58,9 +66,14 @@
 
 ;; C++
 (use-package c++-mode
+  :after rtags
   :mode (("\\.h\\'" . c++-mode)
          ("\\.cc\\'" . c++-mode)
          ("\\.cpp\\'" . c++-mode))
+  :bind (:map c++-mode-map
+              ("<home>" . 'rtags-find-symbol-at-point)
+              ("<prior>" . 'rtags-location-stack-back)
+              ("<next>" . 'rtags-location-stack-forward))
   )
 
 ;; CMake
@@ -95,11 +108,6 @@
 ;; rtags & cmake ide
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package rtags
-  ;; Custom keybindings.
-  :bind (("<home>" . 'rtags-find-symbol-at-point)
-         ("<prior>" . 'rtags-location-stack-back)
-         ("<next>" . 'rtags-location-stack-forward))
-
   :config
   ;; Set path to rtag executables.
   (setq rtags-path
@@ -236,7 +244,7 @@
 ;; In this, default indent is 2 (see 'IndentWidth' key in generated file).
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; C/C++ mode
+;; C/C++ mode modifications
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (add-hook 'c-mode-common-hook 'google-set-c-style)
 
@@ -267,10 +275,10 @@
           (condition-case nil (elpy-goto-definition)
             (error (elpy-rgrep-symbol (thing-at-point 'symbol)))))
   ;; Custom keybindings.
-  :bind (("<home>" . 'goto-def-or-rgrep)
-         ("<prior>" . 'pop-tag-mark)
-         ("<next>" . 'elpy-goto-definition))
-
+  :bind (:map elpy-mode-map
+              ("<home>" . 'goto-def-or-rgrep)
+              ("<prior>" . 'pop-tag-mark)
+              ("<next>" . 'elpy-goto-definition))
   :config
   (elpy-enable)
   ;; Use flycheck not flymake with elpy.
@@ -295,26 +303,26 @@
 ;; counsel keyboard mappings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package ag)
+(use-package magit)
 (use-package counsel
-  :after ag
-  :config
-  (global-set-key (kbd "<f9>") 'counsel-load-theme) ;; Quick theme selection.
-  (global-set-key "\C-s" 'swiper)
-  (global-set-key (kbd "C-c C-r") 'ivy-resume)
-  (global-set-key (kbd "<f6>") 'ivy-resume)
-  (global-set-key (kbd "M-x") 'counsel-M-x)
-  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
-  (global-set-key (kbd "<f1> f") 'counsel-describe-function)
-  (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
-  (global-set-key (kbd "<f1> l") 'counsel-find-library)
-  (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
-  (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
-  (global-set-key (kbd "C-c g") 'counsel-git)
-  (global-set-key (kbd "C-c j") 'counsel-git-grep)
-  (global-set-key (kbd "C-c k") 'counsel-ag)
-  (global-set-key (kbd "C-x l") 'counsel-locate)
-  (global-set-key (kbd "C-x g") 'magit-status)
-  (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
+  :after ag ivy magit
+  :bind (("<f9>" . 'counsel-load-theme)
+         ("\C-s" . 'swiper)
+         ("C-c C-r" . 'ivy-resume)
+         ("<f6>" . 'ivy-resume)
+         ("M-x" . 'counsel-M-x)
+         ("C-x C-f" . 'counsel-find-file)
+         ("<f1> f" . 'counsel-describe-function)
+         ("<f1> v" . 'counsel-describe-variable)
+         ("<f1> l" . 'counsel-find-library)
+         ("<f2> i" . 'counsel-info-lookup-symbol)
+         ("<f2> u" . 'counsel-unicode-char)
+         ("C-c g" . 'counsel-git)
+         ("C-c j" . 'counsel-git-grep)
+         ("C-c k" . 'counsel-ag)
+         ("C-x l" . 'counsel-locate)
+         ("C-x g" . 'magit-status)
+         ("C-r" . 'counsel-minibuffer-history))
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -330,9 +338,8 @@
 ;; expand region
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package expand-region
-  :config
   ;; Overwrite binding to insert non-graphic characters (I never use that).
-  (global-set-key (kbd "C-q") 'er/expand-region)
+  :bind ("C-q" . 'er/expand-region)
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -383,17 +390,8 @@
 ; http://ergoemacs.org/emacs/emacs_buffer_management.html
 ; http://stackoverflow.com/questions/1231188/emacs-list-buffers-behavior
 (use-package ibuffer
+  :bind ("C-x C-b" . 'ibuffer)
   :config
-  ;; Use IBuffer instead for buffer list.
-  (global-set-key (kbd "C-x C-b") 'ibuffer)
-  ;;
-  ;; Bind other-window (and custom prev-window) to more accessible keys.
-  (global-set-key (kbd "C-'") 'other-window)
-  (global-set-key (kbd "C-;") 'prev-window)
-  (defun prev-window ()
-    (interactive)
-    (other-window -1))
-  ;;
   ;; Define IBuffer filter modes.
   (setq ibuffer-saved-filter-groups
         '(("home"
@@ -406,8 +404,8 @@
            ("Help" (or (name . "\*Help\*")
                        (name . "\*Apropos\*")
                        (name . "\*info\*"))))))
-  ;;
-;; Load filter.
+
+  ;; Load filter.
   (add-hook 'ibuffer-mode-hook
             '(lambda ()
                (ibuffer-switch-to-saved-filter-groups "home")))
