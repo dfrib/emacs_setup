@@ -83,8 +83,8 @@
   )
 
 ;; Docker
-(use-package docker-mode
-  :mode "Dockerfile\\'"
+(use-package dockerfile-mode
+  :mode "Dockerfile.*\\'"
   )
 
 ;; PlantUML
