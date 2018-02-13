@@ -80,6 +80,7 @@
 (use-package cmake-mode
   :mode (("CMakeLists\\.txt\\'" . cmake-mode)
          ("\\.cmake\\'" . cmake-mode))
+  :init (setq cmake-tab-width 4)
   )
 
 ;; Docker
