@@ -324,6 +324,7 @@
          ("C-x l" . 'counsel-locate)
          ("C-x g" . 'magit-status)
          ("C-r" . 'counsel-minibuffer-history))
+  :init (setq counsel-git-grep-skip-counting-lines t)
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
