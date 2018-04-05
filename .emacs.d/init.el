@@ -305,6 +305,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package ag)
 (use-package magit)
+(use-package git-commit
+  ;; Limit commit message summary to 50 columns, and wrap content after 72 columns.
+  :init (add-hook 'git-commit-mode-hook
+                  '(lambda ()
+                     (setq-local git-commit-summary-max-length 50)
+                     (setq-local fill-column 72)))
+  )
 (use-package counsel
   :after ag ivy magit
   :bind (("<f9>" . 'counsel-load-theme)
