@@ -123,7 +123,7 @@
   (rtags-diagnostics)
   ;;
   ;; Timeout for reparse on onsaved buffers.
-  (rtags-set-periodic-reparse-timeout 0.5)
+  ;;(rtags-set-periodic-reparse-timeout 0.5)
   ;;
   ;; Rtags standard keybindings ([M-. on symbol to go to bindings]).
   (rtags-enable-standard-keybindings)
@@ -235,8 +235,17 @@
 ;; clang-format
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; clang-format can be triggered using C-M-tab
+(defun my-after-save-actions ()
+  "Used in `after-save-hook'."
+  (when (memq this-command '(save-buffer))
+    'clang-format-buffer
+    ))
+
 (use-package clang-format
   :config (global-set-key [C-M-tab] 'clang-format-region)
+  (add-hook 'c++-mode-hook
+            (lambda ()
+              (add-hook 'after-save-hook 'my-after-save-actions)))
   )
 
 ;; If the repo does not have a .clang-format files, one can
@@ -257,8 +266,8 @@
 
 ;; also toggle on auto-newline and hungry delete minor modes
 (defun my-c++-mode-hook ()
-  (c-set-style "my-style")        ; use my-style defined above
-  (auto-fill-mode))
+  (c-set-style "my-style"))        ; use my-style defined above
+;;  (auto-fill-mode))
 
 (add-hook 'c++-mode-hook 'my-c++-mode-hook)
 
@@ -304,7 +313,9 @@
 ;; counsel keyboard mappings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package ag)
-(use-package magit)
+(use-package magit
+    :init (setq magit-diff-refine-hunk t)
+)
 (use-package git-commit
   ;; Limit commit message summary to 50 columns, and wrap content after 72 columns.
   :init (add-hook 'git-commit-mode-hook
@@ -374,10 +385,15 @@
   (org-babel-do-load-languages
    'org-babel-load-languages
    '(;; other Babel languages
-     (plantuml . t)))
+     (C . t)
+     (plantuml . t)
+     (python . t)
+     ))
   ;; Point to plantuml jar.
   (setq org-plantuml-jar-path
         (expand-file-name "~/opensource/plantuml/plantuml.jar"))
+  ;; Display images inline in org document.
+  (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -473,3 +489,17 @@
 
 (provide 'init)
 ;;; init.el ends here
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (json-reformat use-package swift-mode sublime-themes smart-mode-line-powerline-theme protobuf-mode markdown-mode magit idle-highlight-mode google-c-style flycheck-swift flycheck-rtags flycheck-pos-tip flycheck-plantuml flycheck-color-mode-line expand-region elpy drag-stuff dockerfile-mode counsel company-irony-c-headers company-irony cmake-mode cmake-ide clang-format cask-mode cask ag))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
